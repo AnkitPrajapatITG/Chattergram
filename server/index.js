@@ -1,8 +1,11 @@
 const express = require("express");
+const routes = require('./routes/index.js')
+
 
 const cors = require("cors");
 
 const dotenv = require("dotenv");
+const { dbConnection } = require("./config/db.js");
 
 dotenv.config();
 
@@ -14,10 +17,13 @@ app.use(express.json());
 
 const port = process.env.PORT || 8080;
 
-app.listen(port,()=>{
-    console.log("✅ App is running on port" , port);
+app.listen(port, () => {
+    console.log("✅ App is running on port", port);
 })
 
-app.get("/",(req,res)=>{
+app.use('/api', routes)
+dbConnection()
+
+app.get("/", (req, res) => {
     res.send("<h3>Your server is running </h3>");
 })
