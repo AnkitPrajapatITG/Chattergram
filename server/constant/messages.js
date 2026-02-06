@@ -29,6 +29,7 @@ module.exports.SuccessMessage = {
   SIGNUP_SUCCESS: "Sign UP Success",
   PASSWORD_CHANGED_SUCCESSFULLY: "Password Changed Successfully",
   USER_UPDATED: "User Updated Successfully",
+  DELETED:"Data Deleted Successfully"
 };
 
 
@@ -53,6 +54,7 @@ module.exports.ErrorMessage = {
   PRODUCT_FETCHED: "Error Fecthing Lists.",
   PARTNER_NOT_FOUND: "Partner Not Found.",
   SHOP_UNAVAILABLE: "Shop Not Provided.",
+  POST_NOT_FOUND: "Post Not Found.",
   SHOP_INVALID: "Shop Not Valid.",
   UPLOAD_FILE_FAILURE: "No file's uploaded.",
   WRONG_EMAIL_OR_PASSWORD: "Invalid email or password.",
@@ -72,5 +74,6 @@ module.exports.ErrorMessage = {
   INVALID_SECRET: "Invalid Secrets.",
   PLUGIN_NOT_EXIST: "plugin not added or Off.",
   DATA_NOT_UPDATED: "Data Not Updated.",
-  USER_ALREADY_EXIST: "User Already Exists"
+  USER_ALREADY_EXIST: "User Already Exists",
+  NOT_FOUND:"Data Not Found"
 };

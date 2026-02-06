@@ -24,6 +24,9 @@
 
 const mongoose = require("mongoose");
 
+const dotenv = require('dotenv');
+dotenv.config();
+
 
 
 
@@ -35,8 +38,11 @@ exports.dbConnection = async () => {
 
 
     try {
+        console.log("url",process.env.DB_URL);
+        
         // Connect to MongoDB using connection string from env
         await mongoose.connect(process.env.DB_URL, {
+            
 
         }).then(() => {
             console.log("Connected to MongoDB");

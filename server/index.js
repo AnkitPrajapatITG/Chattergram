@@ -1,6 +1,8 @@
 const express = require("express");
-const routes = require('./routes/index.js')
-
+const routes = require("./routes/index.js");
+const dns = require("dns");
+const { ConnectCloadinary } = require("./config/cloudinary.js");
+dns.setServers(["8.8.8.8", "1.1.1.1"]);
 
 const cors = require("cors");
 
@@ -18,12 +20,14 @@ app.use(express.json());
 const port = process.env.PORT || 8080;
 
 app.listen(port, () => {
-    console.log("✅ App is running on port", port);
-})
+  console.log("✅ App is running on port", port);
+});
 
-app.use('/api', routes)
-dbConnection()
+app.use("/api", routes);
+
+dbConnection();
+ConnectCloadinary();
 
 app.get("/", (req, res) => {
-    res.send("<h3>Your server is running </h3>");
-})
+  res.send("<h3>Your server is running </h3>");
+});

@@ -12,6 +12,10 @@ const PostSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
     likes: [
       {
         user: {
@@ -71,4 +75,4 @@ const PostSchema = new mongoose.Schema(
   },
 );
 
-module.exports = mongoose.model("User") || mongoose.model("Post", UserSchema);
+module.exports = mongoose.model("Post", PostSchema);
