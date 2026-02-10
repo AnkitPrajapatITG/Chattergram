@@ -6,7 +6,17 @@ const jwt = require("jsonwebtoken");
 
 exports.verify = async (req, res, next) => {
   try {
-    const { token } = req.body;
+    const authHeader = req.headers.authorization; // e.g. "Bearer eyJhbGciOiJIUzI1NiIs..."
+    if (!authHeader)
+      return res.status(401).json({ message: "Missing Authorization header" });
+
+    const token = authHeader.startsWith("Bearer ")
+      ? authHeader.split(" ")[1]
+      : null;
+
+    if (!token)
+      return res.status(401).json({ message: "Invalid Authorization format" });
+
     const isValid = await jwt.verify(token, process.env.JWT_SECRET);
 
     if (isValid) {

@@ -47,8 +47,33 @@ exports.deletePostService = async (postId, req, res) => {
   return deletedPost;
 };
 
-exports.getAllPostService = async (userName) => {
-  const allPost = await PostModel.findOne({ user });
+exports.getAllPostService = async () => {
+const allPost = await PostModel.find({})
+  .populate({
+    path: "user",
+    select: "userName image name email"
+  })
+  .populate({
+    path: "comments",
+    populate: {
+      path: "user",
+      select: "userName image name"
+    }
+  })
+  .populate({
+    path: "likes",
+    select: "userName image name"
+  })
+  .populate({
+    path: "views",
+    select: "userName image name"
+  })
+  .populate({
+    path: "share",
+    select: "userName image name"
+  })
+  .sort({ createdAt: -1 })
+  .lean();
   return allPost;
 };
 

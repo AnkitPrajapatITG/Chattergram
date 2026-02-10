@@ -19,6 +19,7 @@ exports.addFollowerService = async ({ userName }, req, res) => {
 
   return { user, partener };
 };
+
 exports.removeFollowerService = async ({ userName }, req, res) => {
   const user = await UserModel.findOne({ userName: req.user.userName });
   const partener = await UserModel.findOne({ userName });
