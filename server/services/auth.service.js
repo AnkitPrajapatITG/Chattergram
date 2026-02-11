@@ -39,18 +39,18 @@ exports.Loginservice = async ({ userName, email, password }, res) => {
   const isCorrect = await bcrypt.compare(password, user.password);
 
   if (!isCorrect) {
-    throw new Error(ErrorMessage.NOT_AUTHORIZED);
+    throw new Error(ErrorMessage.WRONG_EMAIL_OR_PASSWORD);
   }
 
   const token = jwt.sign(
     {
-      userName,
-      email,
+      userName:user.userName,
+      email:user.email,
       _id:user._id
     },
     process.env.JWT_SECRET,
     { expiresIn: "24h" },
   );
 
-  return {token};
+  return {token,user};
 };

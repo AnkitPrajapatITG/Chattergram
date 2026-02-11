@@ -92,6 +92,7 @@ exports.Likeservice = async ({ postId }, req, res) => {
   if (!post) {
     throw new Error(ErrorMessage.POST_NOT_FOUND);
   }
+  console.log("req.user.userName",req.user)
 
   let user = await UserModel.findOne({ userName: req.user.userName });
 
@@ -105,6 +106,11 @@ exports.Likeservice = async ({ postId }, req, res) => {
 
   if (!existLike) {
     post.likes.push(user._id);
+  }
+  else{
+    post.likes = post.likes.filter(
+    (like) => like._id.toString() !== user._id.toString(),
+  );
   }
 
   await post.save();
@@ -126,9 +132,10 @@ exports.Viewservice = async ({ postId }, req, res) => {
   }
 
   const existView = post.views.find(
-    (view) => view._id.toString() === view._id.toString(),
+    (view) => view._id.toString() === user._id.toString(),
   );
 
+  console.log("existView",existView);
   if (!existView) {
     post.views.push(user._id);
   }
