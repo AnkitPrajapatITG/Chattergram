@@ -92,8 +92,10 @@
 // }
 import React, { useState } from "react";
 import { login } from "../../services/apiServices";
+import { useNavigate } from "react-router";
 
 export default function Login() {
+  const navigation =useNavigate();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -122,10 +124,14 @@ export default function Login() {
 
     // For testing
     // console.log("Login Data:", formData);
+
+
     const res = await login(formData);
-    console.log(res.token);
+    console.log(res?.token);
     localStorage.setItem("TOKEN",res.token);
-    alert("Login successful (check console)");
+    localStorage.setItem("USER",JSON.stringify(res?.user));
+    // alert("Login successful (check console)");
+    navigation("/home");
   };
 
   return (
@@ -230,7 +236,7 @@ export default function Login() {
         {/* Signup */}
         <p className="text-center text-sm text-slate-400 mt-6">
           Don’t have an account?
-          <a href="#" className="text-indigo-500 ml-1 hover:underline">
+          <a href="signup" className="text-indigo-500 ml-1 hover:underline">
             Sign up
           </a>
         </p>

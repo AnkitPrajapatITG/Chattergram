@@ -1,6 +1,11 @@
 import React, { useMemo, useState } from "react";
-import { getAllpost } from "../services/apiServices";
+import {
+  getAllpost,
+  toggleLikeToPost,
+  viewPost,
+} from "../services/apiServices";
 import { useEffect } from "react";
+import { FaHeart, FaRegHeart } from "react-icons/fa";
 
 // --- Dummy Response (same shape as your API) ---
 const dummyApiResponse = {
@@ -36,7 +41,12 @@ const dummyApiResponse = {
       },
     ],
     hashTag: "#DeFi #Blockchain #Web3",
-    likes: [{ userId: "u1" }, { userId: "u2" }, { userId: "u3" }, { userId: "u4" }],
+    likes: [
+      { userId: "u1" },
+      { userId: "u2" },
+      { userId: "u3" },
+      { userId: "u4" },
+    ],
     share: [{ userId: "u2" }, { userId: "u6" }],
     views: Array.from({ length: 124 }, (_, i) => ({ userId: `v${i + 1}` })),
     createdAt: "2026-02-06T11:33:56.957Z",
@@ -52,30 +62,20 @@ const stories = [
   { id: 3, name: "John" },
   { id: 4, name: "Emma" },
   { id: 5, name: "Chris" },
-   { id: 1, name: "Alex" },
-  { id: 2, name: "Maya" },
-  { id: 3, name: "John" },
-  { id: 4, name: "Emma" },
-  { id: 5, name: "Chris" },
-   { id: 1, name: "Alex" },
-  { id: 2, name: "Maya" },
-  { id: 3, name: "John" },
-  { id: 4, name: "Emma" },
-  { id: 5, name: "Chris" },
 ];
 
-export default function Dashboard() {
+export default function Dashboard({user}) {
   // Convert API single post into feed array (easy to scale later)
-  const getPosts = async() =>{
-   const posts = await getAllpost();
-   console.log("posts",posts);
-   setFeed(posts);
-  }
-  useEffect(()=>{
+  const getPosts = async () => {
+    const posts = await getAllpost();
+    console.log("posts", posts);
+    setFeed(posts);
+  };
+  useEffect(() => {
     getPosts();
-  },[])
+  }, []);
 
-  const [feed,setFeed] = useState([dummyApiResponse.result,dummyApiResponse.result,dummyApiResponse.result,dummyApiResponse.result]);
+  const [feed, setFeed] = useState([]);
 
   return (
     <div className="min-h-screen bg-slate-950 text-white">
@@ -87,9 +87,11 @@ export default function Dashboard() {
 
         {/* User Icon */}
         <div className="flex items-center gap-3">
-          <span className="text-sm text-slate-300 hidden sm:block">alex_99</span>
+          <span className="text-sm text-slate-300 hidden sm:block">
+            {user.userName}
+          </span>
           <img
-            src="https://i.pravatar.cc/150?img=12"
+            src={user.image ?? "https://i.pravatar.cc/150?img=12"}  
             alt="user"
             className="w-9 h-9 rounded-full border border-slate-800 object-cover"
           />
@@ -124,18 +126,26 @@ export default function Dashboard() {
 }
 
 function PostCard({ post }) {
+  const user = JSON.parse(localStorage.getItem("USER"));
+  const id = user._id;
   const [activeMediaIndex, setActiveMediaIndex] = useState(0);
 
   const tags = useMemo(() => {
     // "#DeFi #Blockchain #Web3" -> ["#DeFi", "#Blockchain", "#Web3"]
     if (!post?.hashTag) return [];
-    return post.hashTag.split(" ").map((t) => t.trim()).filter(Boolean);
+    return post.hashTag
+      .split(" ")
+      .map((t) => t.trim())
+      .filter(Boolean);
   }, [post?.hashTag]);
 
-  const likesCount = post?.likes?.length || 0;
+  const [likesCount, setLikesCount] = useState(post?.likes?.length || 0);
+  const [viewsCount, setViewsCount] = useState(post?.views?.length || 0);
+
+  const [isLiked, setIsLiked] = useState(false);
   const commentsCount = post?.comments?.length || 0;
   const sharesCount = post?.share?.length || 0;
-  const viewsCount = post?.views?.length || 0;
+  // const viewsCount = post?.views?.length || 0;
 
   const createdDate = useMemo(() => {
     try {
@@ -145,8 +155,61 @@ function PostCard({ post }) {
     }
   }, [post.createdAt]);
 
+  async function handleLike() {
+    const updatedPost = await toggleLikeToPost(post._id);
+    setLikesCount(updatedPost?.likes?.length);
+    const Liked = () => {
+      return Boolean(updatedPost.likes.find((u) => u._id == id));
+    };
+    setIsLiked(Liked);
+  }
+
+  useEffect(() => {
+    const Liked = () => {
+      return Boolean(post.likes.find((u) => u._id == id));
+    };
+    setIsLiked(Liked);
+  }, []);
+
+  async function handlePostView() {
+    // alert("viewd");
+    const updatedPost = await viewPost(post._id);
+    setViewsCount(updatedPost.views.length);
+  }
+
+  useEffect(() => {
+    // Intersection Observer logic
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            // Call the function when post comes into view
+            handlePostView();
+            observer.unobserve(entry.target); // Unobserve once the post is in view
+          }
+        });
+      },
+      {
+        threshold: 0.5, // Trigger when 50% of the post is in view
+      },
+    );
+
+    const postElement = document.getElementById(post._id);
+    if (postElement) {
+      observer.observe(postElement);
+    }
+
+    return () => {
+      if (postElement) {
+        observer.unobserve(postElement); // Clean up the observer when the component unmounts
+      }
+    };
+  }, [post._id]);
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
+    <div
+      className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden"
+      id={post._id}
+    >
       {/* Header */}
       <div className="flex items-center gap-3 px-4 py-3">
         <img
@@ -199,8 +262,19 @@ function PostCard({ post }) {
         )}
 
         {/* Actions counts */}
-        <div className="flex flex-wrap gap-4 text-sm text-slate-300">
-          <span>❤️ {likesCount}</span>
+        <div className="flex flex-wrap gap-4 text-sm text-slate-300 cursor-pointer">
+          <span onClick={() => handleLike()}>
+            {isLiked ? (
+              <div>
+                <FaHeart />
+              </div>
+            ) : (
+              <div>
+                <FaRegHeart />
+              </div>
+            )}
+            {likesCount}
+          </span>
           <span>💬 {commentsCount}</span>
           <span>🔁 {sharesCount}</span>
           <span>👁 {viewsCount}</span>
@@ -225,9 +299,7 @@ function PostCard({ post }) {
         {/* Recent comments preview */}
         {post?.comments?.length > 0 && (
           <div className="pt-2 border-t border-slate-800">
-            <div className="text-xs text-slate-400 mb-2">
-              Recent comments
-            </div>
+            <div className="text-xs text-slate-400 mb-2">Recent comments</div>
             <div className="space-y-2">
               {post.comments.slice(0, 2).map((c) => (
                 <div key={c._id} className="text-sm">
