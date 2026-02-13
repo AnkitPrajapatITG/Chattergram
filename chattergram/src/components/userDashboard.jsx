@@ -7,108 +7,157 @@ import {
 import { useEffect } from "react";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 
-// --- Dummy Response (same shape as your API) ---
-const dummyApiResponse = {
-  status: true,
-  message: "Data Fetched Successfully.",
-  result: {
-    _id: "6985d1a4b8f39779735fbda6",
-    title: "The Future of Decentralized Finance",
-    content:
-      "Exploring how blockchain technology is reshaping global banking systems through transparency and peer-to-peer protocols.",
-    user: {
-      _id: "69859ab31be2f29519c3f820",
-      name: "Alex Johnson",
-      username: "alex_99",
-      avatar: "https://i.pravatar.cc/150?img=12",
-    },
-    media: [
-      "https://res.cloudinary.com/dk900kd01/image/upload/v1770377635/chattergram/egfqvv7gekztrbb8ce25.jpg",
-      "https://res.cloudinary.com/dk900kd01/image/upload/v1770377635/chattergram/nszkmu9indjwwcmmtaab.jpg",
-    ],
-    comments: [
-      {
-        _id: "c1",
-        user: { username: "maya.design" },
-        text: "This is super interesting 🔥",
-        createdAt: "2026-02-06T12:10:00.000Z",
-      },
-      {
-        _id: "c2",
-        user: { username: "john.codes" },
-        text: "Web3 adoption is going to be huge.",
-        createdAt: "2026-02-06T12:18:00.000Z",
-      },
-    ],
-    hashTag: "#DeFi #Blockchain #Web3",
-    likes: [
-      { userId: "u1" },
-      { userId: "u2" },
-      { userId: "u3" },
-      { userId: "u4" },
-    ],
-    share: [{ userId: "u2" }, { userId: "u6" }],
-    views: Array.from({ length: 124 }, (_, i) => ({ userId: `v${i + 1}` })),
-    createdAt: "2026-02-06T11:33:56.957Z",
-    updatedAt: "2026-02-06T11:33:56.957Z",
-    __v: 0,
-  },
+// Dummy Customer Data (simulate fetching from backend)
+const fetchCustomerData = () => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        userName: "alex_99",
+        name: "Alex Johnson",
+        bio: "Web Developer | Blockchain Enthusiast | Digital Nomad",
+        dob: "1992-06-15",
+        followers: 500,
+        following: 180,
+        posts: 35,
+        image: "https://i.pravatar.cc/150?img=12", // User's profile image
+      });
+    }, 1000); // simulate network delay
+  });
 };
 
-// --- Dummy stories ---
-const stories = [
-  { id: 1, name: "Alex" },
-  { id: 2, name: "Maya" },
-  { id: 3, name: "John" },
-  { id: 4, name: "Emma" },
-  { id: 5, name: "Chris" },
-];
+export default function UserDashboard() {
+  const [userData, setUserData] = useState(null);
 
-export default function Dashboard({user}) {
-  // Convert API single post into feed array (easy to scale later)
-  const getPosts = async () => {
-    const posts = await getAllpost();
-    console.log("posts", posts);
-    setFeed(posts);
-  };
   useEffect(() => {
-    getPosts();
+    const getUserData = async () => {
+      const data = await fetchCustomerData();
+      setUserData(data);
+    };
+    getUserData();
   }, []);
 
-  const [feed, setFeed] = useState([]);
+  if (!userData)
+    return <div className="text-white text-center">Loading...</div>; // Show loading message
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white">
-      {/* Navbar */}
-   
-      {/* Content */}
-      <div className="max-w-2xl mx-auto px-4">
-        {/* Stories */}
-        <div className="flex gap-4 overflow-x-auto py-6">
-          {stories.map((story) => (
-            <div key={story.id} className="flex flex-col items-center shrink-0">
-              <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-indigo-500 to-pink-500 p-[2px]">
-                <div className="w-full h-full rounded-full bg-slate-900 flex items-center justify-center text-sm font-medium">
-                  {story.name[0]}
-                </div>
-              </div>
-              <span className="text-xs text-slate-400 mt-1">{story.name}</span>
-            </div>
-          ))}
-        </div>
+    <div className="min-h-screen bg-slate-950 text-white p-6 ">
+      {/* Profile Section */}
+      <div className="bg-slate-900 rounded-2xl shadow-xl p-8 flex flex-col items-center gap-6">
+        {/* Profile Header */}
+        {/* <div className="flex items-center gap-6">
+          <img
+            src={userData.image}
+            alt="profile"
+            className="w-48 h-48 rounded-full object-cover"
+          />
+          <div className="flex flex-col">
+            <h2 className="text-2xl font-semibold">@{userData.userName}</h2>
+            <h3 className="text-lg font-medium">{userData.name}</h3>
+            <p className="text-sm text-slate-400">{userData.bio}</p>
+            <p className="text-xs text-slate-500">
+              DOB: {new Date(userData.dob).toLocaleDateString()}
+            </p>
+          </div>
+        </div> */}
+<div className="flex items-center gap-6 p-4">
+  {/* Profile Image */}
+  <img
+    src={userData.image}
+    alt="profile"
+    className="w-24 h-24 rounded-full object-cover border-4 border-blue-500" 
+  />
+  
+  {/* User Info Section */}
+  <div className="flex flex-col">
+    {/* Username and Full Name */}
+    <h2 className="text-xl font-semibold">@{userData.userName}</h2>
+    <h3 className="text-lg font-medium">{userData.name}</h3>
+    
+    {/* Bio */}
+    <p className="text-sm text-slate-400 mt-1">{userData.bio}</p>
+    
+    {/* Date of Birth */}
+    <p className="text-xs text-slate-500 mt-1">DOB: {new Date(userData.dob).toLocaleDateString()}</p>
+    
+    {/* Additional Profile Stats */}
+    <div className="flex gap-6 mt-3">
+      <div className="flex flex-col items-center">
+        <p className="text-sm">1,217</p>
+        <p className="text-xs text-slate-500">Posts</p>
+      </div>
+      <div className="flex flex-col items-center">
+        <p className="text-sm">270M</p>
+        <p className="text-xs text-slate-500">Followers</p>
+      </div>
+      <div className="flex flex-col items-center">
+        <p className="text-sm">279</p>
+        <p className="text-xs text-slate-500">Following</p>
+      </div>
+    </div>
+  </div>
+</div>
 
-        {/* Feed */}
-        <div className="space-y-8 pb-10">
-          {feed.map((post) => (
-            <PostCard key={post._id} post={post} />
-          ))}
+        {/* Stats Section */}
+        {/* <div className="flex gap-8 mt-6">
+          <div className="text-center">
+            <span className="text-xl font-bold">{userData.posts}</span>
+            <p className="text-sm text-slate-400">Posts</p>
+          </div>
+          <div className="text-center">
+            <span className="text-xl font-bold">{userData.followers}</span>
+            <p className="text-sm text-slate-400">Followers</p>
+          </div>
+          <div className="text-center">
+            <span className="text-xl font-bold">{userData.following}</span>
+            <p className="text-sm text-slate-400">Following</p>
+          </div>
+        </div> */}
+      </div>
+
+      {/* Posts Section */}
+      <div className="mt-12 bg-slate-900 rounded-2xl shadow-xl p-8">
+        <h3 className="text-xl font-semibold mb-4">Recent Posts</h3>
+
+        {/* Dummy posts */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4">
+          <PostCard />
+          <PostCard />
+          <PostCard />
+          <PostCard />
+          <PostCard />
+          <PostCard />
+          <PostCard />
+          <PostCard />
+          <PostCard />
+          <PostCard />
+          <PostCard />
+          <PostCard />
+          <PostCard />
+          <PostCard />
         </div>
       </div>
     </div>
   );
 }
 
-function PostCard({ post }) {
+// Post Card Component (for displaying posts)
+
+function PostCard() {
+  const post = {
+    title: "The Future of Decentralized Finance",
+    content:
+      "Exploring how blockchain technology is reshaping global banking systems through transparency and peer-to-peer protocols.",
+    media: [
+      "https://res.cloudinary.com/dk900kd01/image/upload/v1770377635/chattergram/egfqvv7gekztrbb8ce25.jpg",
+      "https://res.cloudinary.com/dk900kd01/image/upload/v1770377635/chattergram/nszkmu9indjwwcmmtaab.jpg",
+    ],
+    likes: [],
+    comments: [],
+    shares: [],
+    views: [],
+    hashTag: "#DeFi #Blockchain #Web3",
+  };
+
   const user = JSON.parse(localStorage.getItem("USER"));
   const id = user._id;
   const [activeMediaIndex, setActiveMediaIndex] = useState(0);
@@ -190,7 +239,7 @@ function PostCard({ post }) {
   }, [post._id]);
   return (
     <div
-      className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden"
+      className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden max-w-lg mx-auto"
       id={post._id}
     >
       {/* Header */}
